@@ -43,7 +43,48 @@
   const bodyParser = require('body-parser');
   
   const app = express();
+
+  let todoList = [];
+  // var todoId = 0; // we will access each element of array using its index from array
   
+  app.get("/todos",(req,res) => {
+    res.status(200).json(todoList);
+  })
+
+  app.get("/todos/:id",(req,res)=>{
+    let id = req.params.id;
+    if(id <= todoList.length){
+      id = id - 1;
+      res.status(200).json({title : todoList[id]})
+    }else{
+      throw new Error("Not found");
+    }
+  })
+
   app.use(bodyParser.json());
   
+  app.post("/todos",(req,res)=>{
+    const title = req.body.title;
+    const desc = req.body.description;
+    // todoList[title] = todoList[desc];
+    todoList.push({title:desc});
+
+    res.status(201).json({id : todoList.length-1});
+
+  })
+
+  app.put("/todos/:id",(req,res)=>{
+    let id = req.params.id;
+    if(id <= todoList.length){
+      id = id - 1;
+      todoList[id] = 
+      res.status(200).send();
+    }else{
+      throw new Error("Not found");
+    }    
+  })
+
+  app.delete("/todos/:id" , (req,res)=>{
+
+  })
   module.exports = app;

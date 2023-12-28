@@ -16,6 +16,25 @@ setInterval(() => {
     numberOfRequestsForUser = {};
 }, 1000)
 
+function reqCountChecker(req,res,next){
+  let user = req["user-id"];
+
+  if(numberOfRequestsForUser[user] !== undefined){
+    let count = numberOfRequestsForUser[user];
+    if(count > 5){
+      res.status(404).json({name:"You are blocked.."});
+    }else{
+      count++;
+      numberOfRequestsForUser[user] = count;
+    }
+  }else{
+    numberOfRequestsForUser[user] = 1;
+  }
+  next();
+}
+
+app.use(reqCountChecker);
+
 app.get('/user', function(req, res) {
   res.status(200).json({ name: 'john' });
 });

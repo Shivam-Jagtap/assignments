@@ -1,20 +1,52 @@
 const { Router } = require("express");
 const router = Router();
 const userMiddleware = require("../middleware/user");
+const { User, Course } = require("../db");
 
 // User Routes
-app.post('/signup', (req, res) => {
+router.post('/signup', (req, res) => {
     // Implement user signup logic
+    const userName = req.body.username;
+    const password = req.body.password;
+
+    async function createUser(){
+        try{
+            await User.create({
+                username : userName,
+                password : password
+            })
+            res.json({ message: 'User created successfully' });
+        }catch{
+            res.json({mesasge : "an error occured"})
+        }
+    }
+    createUser();
+
 });
 
-app.get('/courses', (req, res) => {
+router.get('/courses', (req, res) => {
     // Implement listing all courses logic
+     async function findCourses(){
+        const courses = await Course.find();
+        res.send(courses);
+     }
+     findCourses();
 });
 
-app.post('/courses/:courseId', userMiddleware, (req, res) => {
+router.post('/courses/:courseId', userMiddleware, (req, res) => {
     // Implement course purchase logic
+    const courseid = req.params.courseId;
+    const userName = req.headers.username;
+
+    
+    Course.findOne({_id : courseid},(data,err)=>{
+        
+    })
+
+    
+    
 });
 
-app.get('/purchasedCourses', userMiddleware, (req, res) => {
+router.get('/purchasedCourses', userMiddleware, (req, res) => {
     // Implement fetching purchased courses logic
 });
