@@ -3,7 +3,10 @@ const adminMiddleware = require("../middleware/admin");
 const router = Router();
 
 // Admin Routes
+<<<<<<< HEAD
 
+=======
+>>>>>>> 44221a6567c34bcb8321268b6c0180e2a2a48d63
 router.post('/signup', (req, res) => {
     // Implement admin signup logic
     const newUserName = req.body.username;

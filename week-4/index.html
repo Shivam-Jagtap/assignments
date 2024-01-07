@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <script>
+    let globalId = 1;
+    let todoState = [];
+    let oldTodoState = [];
+
+    // function addTodoToDom() {
+      
+    // }
+    function addTodoToDom(todo) {
+      // create a new todo in dom
+      var newDiv = document.createElement('div');
+      newDiv.id = todo.id;
+      
+      var title = document.createElement('div');
+      var desc = document.createElement('div');
+      title.innerHTML = todo.title;
+      desc.innerHTML = todo.description;
+      newDiv.appendChild(title);
+      newDiv.appendChild(desc);
+
+      document.getElementById('todos').appendChild(newDiv);
+    }
+
+    function removeTodoFromDom(todo) {
+      // get the parentNode of div to remove 
+      var parentElement = document.getElementById(todo.id).parentNode;
+      // get a reference for element to be removed , since removeChild method takes reference and not actual element
+      var childElementToRemove = document.getElementById(todo.id);
+
+      parentElement.removeChild(childElementToRemove);
+      
+    }
+
+    function updateTodoInDom(oldTodo, newTodo) {
+        // get the old Todo
+        var oldOne = document.getElementById(oldTodo.id);
+        var updateTitleDiv = oldOne.querySelector(':first-child');
+        var updateDescDiv = oldOne.querySelector(':last-child');
+
+        updateTitleDiv.innerHTML = newTodo.title;
+        updateDescDiv.innerHTML = newTodo.description;
+
+     }
+
+    function updateState(newTodos) {
+      // calculate the diff b/w newTodos and oldTodos.
+      // More specifically, find out what todos are - 
+      // 1. added
+      // 2. deleted
+      // 3. updated
+      // const newChecker = newTodos; // this is a mistake , if we update newChecker then it will changes in newTodos also, javascript is dumb
+      const newChecker = [...newTodos];
+      const added = [];
+      const deleted = [];
+      const updated = []; //in updated we will store both old and new todos
+      try {
+        
+      oldTodoState.forEach((obj) => {
+        let check = false;
+        newChecker.forEach((obj2)=>{
+          if(!check){
+            if(obj.id === obj2.id && obj.title === obj2.title && obj.description === obj2.description){
+            //this object is not touched in new list
+            //remove this object from both lists
+            oldTodoState.splice(oldTodoState.indexOf(obj),1);
+            newChecker.splice(newChecker.indexOf(obj2,1));
+            check = true;
+          }else if(obj.id === obj2.id && obj.title !== obj2.id){
+            // it means object is updated
+            //add to updated and remove from both
+            let addobj = {
+              oldObj : obj,
+              newObj : obj2
+            }
+            updated.push(addobj);
+            oldTodoState.splice(oldTodoState.indexOf(obj),1);
+            newChecker.splice(newChecker.indexOf(obj2,1));
+            check = true;
+          }
+          }
+        })
+        if(!check){
+          // this means obj is not present in new list so add it in deleted array
+          deleted.push(obj);
+          oldTodoState.splice(oldTodoState.indexOf(obj),1);
+        }
+      });
+      } catch (error) {
+        
+      }
+      
+      // if newChecker has some elements left it means these are new elements added
+      if(newChecker.length > 0){
+          newChecker.forEach((obj)=>{
+            added.push(obj);
+          })
+        }
+
+      // call addTodo, removeTodo, updateTodo functions on each of the elements
+      // first remove all deleted todos, then make changes in updated todos and then add new ones
+      try {
+        deleted.forEach((obj)=>{
+        removeTodoFromDom(obj);
+      })
+      } catch (error) {
+        
+      }
+      
+      try {
+        updated.forEach((obj)=>{
+        updateTodoInDom(obj.oldObj,obj.newObj);
+      })
+      } catch (error) {
+        
+      }
+   
+      try {
+        added.forEach((obj)=>{
+        addTodoToDom(obj);
+      })
+      } catch (error) {
+        
+      }
+      
+      
+      oldTodoState = newTodos;
+    }
+
+    function addTodo() {
+      const title = document.getElementById("title").value;
+      const description = document.getElementById("description").value;
+      todoState.push({
+        title: title,
+        description: description,
+        id: globalId++,
+      })
+      console.log(todoState);
+      updateState(todoState);
+    }
+  </script>
+</head>
+
+<body>
+  <input type="text" id="title" placeholder="Todo title"></input> <br /><br />
+  <input type="text" id="description" placeholder="Todo description"></input> <br /><br />
+  <button onclick="addTodo()">Add todo</button>
+  <br /> <br />
+
+  <div id="todos">
+
+  </div>
+</body>
+
+</html>
